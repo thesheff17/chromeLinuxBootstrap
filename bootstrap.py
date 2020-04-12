@@ -79,6 +79,25 @@ def check_for_root():
 		print ("Please use root or sudo")
 		sys.exit(1)
 
+def set_git_info():
+    email = input("Please enter your email? ")
+
+    sys.stderr.write("\x1b[2J\x1b[H")
+    name = input("Please enter  your full name? ")
+
+    command1 = 'git config --global user.email "' + email + '"'
+    command2 = 'git config --global user.name "' + name + '"'
+
+    sb.run(command1, shell=True)
+    sb.run(command2, shell=True)
+    
+    d = '/home/'
+    subdirs = [os.path.join(d, o) for o in os.listdir(d) if os.path.isdir(os.path.join(d,o))]
+
+    for each in subdirs:
+        command3 = "su - " + each.split("/")[-1] + " -c " + '"' + command1 + '"'
+        sb.run(command3, shell=True)
+     
 def apt_get_packages():
     result = sb.run(["apt-get", "update"])
     check_return_status(result, "could not run apt-get update")
@@ -139,13 +158,17 @@ def install_golang():
 
 if __name__ == "__main__":
     start = time.time()
+    
+    # clear screen
+    sys.stderr.write("\x1b[2J\x1b[H")
     print ("bootstrap.py started...")
     
     check_for_root()
+    set_git_info()
     # apt_get_packages()
     # install_ruby_rails()
     # install_rust()
-    install_golang()
+    # install_golang()
 
     done = time.time()
     elapsed = done - start
