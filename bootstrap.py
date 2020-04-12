@@ -40,7 +40,20 @@ import time
 # easily change vars
 
 # apt-get packages
-PACKAGES = ["ca-certificates", "build-essential", "htop", "vim", "wget", "tmux"]
+PACKAGES_LIST = ["build-essential",
+                 "ca-certificates",
+                 "code",
+                 "default-mysql-server",
+                 "htop",
+                 "openjdk-11-jdk",
+                 "nodejs",
+                 "npm",
+                 "postgresql-11",
+                 "python3-pip",
+                 "python3-dev",
+                 "vim",
+                 "wget",
+                 "tmux"]
 
 # ruby gems
 GEMS = "bundler jekyll"
@@ -99,12 +112,39 @@ def set_git_info():
         sb.run(command3, shell=True)
      
 def apt_get_packages():
+    # vscode stuff
+    command1 = "curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg"
+    command2 = "mv microsoft.gpg /etc/apt/trusted.gpg.d/microsoft.gpg"
+
+    result = sb.run(command1, shell=True)
+    check_return_status(result, "could not curl vcode file")
+
+    result = sb.run(command2, shell=True)
+    check_return_status(result, "could not move vcode gpg file")
+
     result = sb.run(["apt-get", "update"])
     check_return_status(result, "could not run apt-get update")
 
-    install_command = ["apt-get", "-y", "install"] + PACKAGES
-    result = sb.run(install_command)
+    packages = " ".join(PACKAGES_LIST)
+    install_command = "export DEBIAN_FRONTEND=noninteractive && apt-get -y install " + packages
+    result = sb.run(install_command, shell=True)
     check_return_status(result, "could not apt-get install packages")
+
+def generate_ssh_keys():
+    command1 = "ssh-keygen -t rsa -f /root/.ssh/id_rsa -N '' -b 4096"
+    if not os.path.isfile("/root/.ssh/id_rsa"):
+        result = sb.run(command1, shell=True)
+        check_return_status(result, "could not generate the root key")
+
+    # generate keys for anyone users in the home directory
+    d = '/home/'
+    subdirs = [os.path.join(d, o) for o in os.listdir(d) if os.path.isdir(os.path.join(d,o))]
+
+    for each in subdirs:
+        if not os.path.isfile(each + "/.ssh/id_rsa"):
+            command2 = "ssh-keygen -t rsa -f " + each + "/.ssh/id_rsa -N '' -b 4096"
+            result = sb.run(command2, shell=True)
+            check_return_status(result, "could not generate ssh key for: " + each)
 
 def install_ruby_rails():
     command1 = "gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB"
@@ -160,15 +200,16 @@ if __name__ == "__main__":
     start = time.time()
     
     # clear screen
-    sys.stderr.write("\x1b[2J\x1b[H")
+    # sys.stderr.write("\x1b[2J\x1b[H")
     print ("bootstrap.py started...")
     
     check_for_root()
-    set_git_info()
+    # set_git_info()
     apt_get_packages()
-    install_ruby_rails()
-    install_rust()
-    install_golang()
+    generate_ssh_keys()
+    # install_ruby_rails()
+    # install_rust()
+    # install_golang()
 
     done = time.time()
     elapsed = done - start
