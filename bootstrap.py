@@ -165,10 +165,10 @@ if __name__ == "__main__":
     
     check_for_root()
     set_git_info()
-    # apt_get_packages()
-    # install_ruby_rails()
-    # install_rust()
-    # install_golang()
+    apt_get_packages()
+    install_ruby_rails()
+    install_rust()
+    install_golang()
 
     done = time.time()
     elapsed = done - start
