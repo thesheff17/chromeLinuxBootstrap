@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2015, Dan Sheffner Digital Imaging Software Solutions, INC
+# Copyright (c) Dan Sheffner Digital Imaging Software Solutions, INC
 # All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
