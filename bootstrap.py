@@ -28,6 +28,8 @@ This program will bootstrap the debian container on chromebooks
 """
 import os
 import sys
+import subprocess
+import time
 
 def check_for_root():
 	if os.geteuid() != 0:
@@ -35,5 +37,25 @@ def check_for_root():
 		print ("Please use root or sudo")
 		sys.exit(1)
 
+def apt_get_packages():
+    packages = ["ca-certificates", "build-essential", "htop", "vim", "tmux"]
+    subprocess.run(["apt-get", "update"])
+    install_command = ["apt-get", "-y", "install"] + packages
+    subprocess.run(install_command)
+
+def install_ruby_rails():
+    command1 = "gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB"
+    command2 = "curl -sSL https://get.rvm.io | bash -s stable --rails"
+    subprocess.run(command1, shell=True)
+    subprocess.run(command2, shell=True)
+
 if __name__ == "__main__":
-	check_for_root()
+    start = time.time()
+    
+    check_for_root()
+    apt_get_packages()
+    install_ruby_rails()
+
+    done = time.time()
+    elapsed = done - start
+    print ("Time elapsed in seconds: %s" % (elapsed))
