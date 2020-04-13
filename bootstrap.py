@@ -89,11 +89,24 @@ def check_for_root():
         sys.exit(1)
 
 def set_git_info():
-    print ("config git info")
-    email = input("Please enter your email? ")
+    # we can add a file called gitinfo that is:
+    # email
+    # username 
+    # and I will automatically read it here otherwise it prompts you for this info
 
-    sys.stderr.write("\x1b[2J\x1b[H")
-    name = input("Please enter  your full name? ")
+    print ("config git info")
+    email = ""
+    name = ""
+
+    if os.path.isfile("./gitinfo"):
+        f1 = open("./gitinfo", 'r')
+        data = f1.readlines()
+        f1.close()
+        email = data[0]
+        name = data[1]
+    else:
+        email = input("Please enter your email? ")
+        name = input("Please enter  your full name? ")
 
     command1 = 'git config --global user.email "' + email + '"'
     command2 = 'git config --global user.name "' + name + '"'
@@ -200,7 +213,7 @@ if __name__ == "__main__":
     start = time.time()
     
     # clear screen
-    sys.stderr.write("\x1b[2J\x1b[H")
+    sb.run(["clear"])
     print ("bootstrap.py started...")
     
     check_for_root()
