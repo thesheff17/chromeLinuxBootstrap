@@ -199,7 +199,7 @@ def configure_pip():
 if __name__ == "__main__":
     start = time.time()
     
-    clear screen
+    # clear screen
     sys.stderr.write("\x1b[2J\x1b[H")
     print ("bootstrap.py started...")
     
