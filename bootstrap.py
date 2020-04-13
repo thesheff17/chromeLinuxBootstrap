@@ -161,7 +161,7 @@ def generate_ssh_keys():
             sb.run(command4, shell=True, check=True)
 
 def install_ruby_rails():
-    command1 = "gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB"
+    command1 = "gpg --yes --always-trust --keyserver hkp://pool.sks-keyservers.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB"
     command2 = "curl -sSL https://get.rvm.io | bash -s stable --rails"
     command3 = "sudo ln -s /usr/local/rvm/rubies/ruby*/bin/ruby /usr/bin/ruby"
     command4 = "/usr/local/rvm/rubies/ruby*/bin/gem install " + GEMS 
