@@ -111,8 +111,10 @@ def apt_get_packages():
     command1 = "curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg"
     command2 = "mv microsoft.gpg /etc/apt/trusted.gpg.d/microsoft.gpg"
 
-    sb.run(command1, shell=True, check=True)
+    vscodestring = "deb [arch=amd64 signed-by=/usr/share/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/vscode stable main"
+    add_to_file('/etc/apt/sources.list.d/vscode.list', vscodestring)
 
+    sb.run(command1, shell=True, check=True)
     sb.run(command2, shell=True, check=True)
 
     sb.run(["apt-get", "update"], check=True)
