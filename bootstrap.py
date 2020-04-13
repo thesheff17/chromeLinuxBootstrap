@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) Dan Sheffner Digital Imaging Software Solutions, INC
+# Copyright (c) 2020, Dan Sheffner Digital Imaging Software Solutions, INC
 # All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
@@ -26,10 +26,9 @@
 """
 This program will bootstrap the debian container on chromebooks
 """
+
 # TODO
-# look for nodejs installation
-# lets start configuring vim
-# what other tools should I install? database tools?
+# basic vim tooling
 
 import os
 import sys
@@ -58,18 +57,13 @@ PACKAGES_LIST = ["build-essential",
 # ruby gems
 GEMS = "bundler jekyll"
 
+# global pip packages
+PIP_PACKAGES = ["virtualenvwrapper",
+                "virtualenv"]
+
 # golang url
 GOLANG = "https://dl.google.com/go/go1.14.2.linux-amd64.tar.gz"
 GOLANGFILE = GOLANG.split("/")[-1]
-
-def check_return_status(result, message):
-    try:
-        if result.returncode != 0:
-            print (message)
-            sys.exit(1)
-    except AttributeError:
-        print ("could not find returncode value")
-        sys.exit(1)
 
 def add_to_file(filename, contents):
     f1 = open(filename, 'r')
@@ -101,40 +95,35 @@ def set_git_info():
     command1 = 'git config --global user.email "' + email + '"'
     command2 = 'git config --global user.name "' + name + '"'
 
-    sb.run(command1, shell=True)
-    sb.run(command2, shell=True)
+    sb.run(command1, shell=True, check=True)
+    sb.run(command2, shell=True, check=True)
     
     d = '/home/'
     subdirs = [os.path.join(d, o) for o in os.listdir(d) if os.path.isdir(os.path.join(d,o))]
 
     for each in subdirs:
         command3 = "su - " + each.split("/")[-1] + " -c " + '"' + command1 + '"'
-        sb.run(command3, shell=True)
+        sb.run(command3, shell=True, check=True)
      
 def apt_get_packages():
     # vscode stuff
     command1 = "curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg"
     command2 = "mv microsoft.gpg /etc/apt/trusted.gpg.d/microsoft.gpg"
 
-    result = sb.run(command1, shell=True)
-    check_return_status(result, "could not curl vcode file")
+    sb.run(command1, shell=True, check=True)
 
-    result = sb.run(command2, shell=True)
-    check_return_status(result, "could not move vcode gpg file")
+    sb.run(command2, shell=True, check=True)
 
-    result = sb.run(["apt-get", "update"])
-    check_return_status(result, "could not run apt-get update")
+    sb.run(["apt-get", "update"], check=True)
 
     packages = " ".join(PACKAGES_LIST)
     install_command = "export DEBIAN_FRONTEND=noninteractive && apt-get -y install " + packages
-    result = sb.run(install_command, shell=True)
-    check_return_status(result, "could not apt-get install packages")
-
+    sb.run(install_command, shell=True, check=True)
+    
 def generate_ssh_keys():
     command1 = "ssh-keygen -t rsa -f /root/.ssh/id_rsa -N '' -b 4096"
     if not os.path.isfile("/root/.ssh/id_rsa"):
-        result = sb.run(command1, shell=True)
-        check_return_status(result, "could not generate the root key")
+        sb.run(command1, shell=True, check=True)
 
     # generate keys for anyone users in the home directory
     d = '/home/'
@@ -143,35 +132,26 @@ def generate_ssh_keys():
     for each in subdirs:
         if not os.path.isfile(each + "/.ssh/id_rsa"):
             command2 = "ssh-keygen -t rsa -f " + each + "/.ssh/id_rsa -N '' -b 4096"
-            result = sb.run(command2, shell=True)
-            check_return_status(result, "could not generate ssh key for: " + each)
-
+            sb.run(command2, shell=True, check=True)
+            
 def install_ruby_rails():
     command1 = "gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB"
     command2 = "curl -sSL https://get.rvm.io | bash -s stable --rails"
     command3 = "sudo ln -s /usr/local/rvm/rubies/ruby*/bin/ruby /usr/bin/ruby"
     command4 = "/usr/local/rvm/rubies/ruby*/bin/gem install " + GEMS 
 
-    result = sb.run(command1, shell=True)
-    check_return_status(result, "could not run gpg install for rvm")
-
-    result = sb.run(command2, shell=True)
-    check_return_status(result, "could not install ruby or rails")
+    sb.run(command1, shell=True, check=True)
+    sb.run(command2, shell=True, check=True)
 
     if os.path.isfile("/usr/bin/ruby"):
         os.remove("/usr/bin/ruby")
-    result = sb.run(command3, shell=True)
-    check_return_status(result, "could not make ruby symlink")
-
-    result = sb.run(command4, shell=True)
-    check_return_status(result, "could not install custom gems")
-
+    sb.run(command3, shell=True, check=True)
+    
+    sb.run(command4, shell=True)
+    
 def install_rust():
     command1 = "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y"
-    result = sb.call(command1, shell=True)
-
-    # this returns a weird status code for now I'm not going to check this
-    # check_return_status(result, "could not install rust with rustup")
+    sb.run(command1, shell=True, check=True)
 
 def install_golang():
     # clean up if we alrady installed it
@@ -184,8 +164,8 @@ def install_golang():
     command1 = ["wget", GOLANG]
     command2 = "tar -C /usr/local -xzf go*.tar.gz"
 
-    result = sb.call(command1)
-    result = sb.call(command2, shell=True)
+    sb.run(command1, check=True)
+    sb.run(command2, shell=True, check=True)
 
     s1 = "export PATH=$PATH:/usr/local/go/bin"
     add_to_file('/root/.bashrc', s1)
@@ -196,6 +176,13 @@ def install_golang():
     for each in subdirs:
         add_to_file(each + "/.bashrc", s1)
 
+def configure_pip():
+    command1 = ["pip3", "install", "pip", "--upgrade"]
+    command2 = ["pip3", "install",] + PIP_PACKAGES
+
+    sb.run(command1, check=True)
+    sb.run(command2, check=True)
+   
 if __name__ == "__main__":
     start = time.time()
     
@@ -204,12 +191,13 @@ if __name__ == "__main__":
     print ("bootstrap.py started...")
     
     check_for_root()
-    # set_git_info()
+    set_git_info()
     apt_get_packages()
     generate_ssh_keys()
-    # install_ruby_rails()
-    # install_rust()
-    # install_golang()
+    install_ruby_rails()
+    install_rust()
+    install_golang()
+    configure_pip()
 
     done = time.time()
     elapsed = done - start
