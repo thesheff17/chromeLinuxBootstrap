@@ -58,7 +58,8 @@ PACKAGES_LIST = ["build-essential",
 GEMS = "bundler jekyll"
 
 # global pip packages
-PIP_PACKAGES = ["virtualenvwrapper",
+PIP_PACKAGES = ["bpython",
+                "virtualenvwrapper",
                 "virtualenv"]
 
 # golang url
