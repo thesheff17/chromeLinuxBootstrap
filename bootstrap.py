@@ -88,6 +88,7 @@ def check_for_root():
 		sys.exit(1)
 
 def set_git_info():
+    print ("config git info")
     email = input("Please enter your email? ")
 
     sys.stderr.write("\x1b[2J\x1b[H")
@@ -197,8 +198,8 @@ def configure_pip():
 if __name__ == "__main__":
     start = time.time()
     
-    # clear screen
-    # sys.stderr.write("\x1b[2J\x1b[H")
+    clear screen
+    sys.stderr.write("\x1b[2J\x1b[H")
     print ("bootstrap.py started...")
     
     check_for_root()
