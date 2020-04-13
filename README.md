@@ -8,7 +8,7 @@ if you agree to configure your machine with the script copy/paste the below comm
 git clone https://github.com/thesheff17/chromeLinuxBootstrap.git && cd chromeLinuxBootstrap && sudo ./bootstrap.py
 ```
 
-The goal of this script will try to follow these goals:
+Goals of this script:
 * The main goal is to bootstrap your chromebook into a development box.
 * This script should always be able to run again if something goes wrong.
   * For example if you loose internet connection we want to run bootstrap.py and have it finish a 2nd time.
