@@ -9,8 +9,8 @@ git clone https://github.com/thesheff17/chromeLinuxBootstrap.git && cd chromeLin
 ```
 
 The goal of this script will try to follow these goals:
-* The main goal is to bootstrap your chromebook into a development box
-* this script should always be able to run again if something goes wrong
-  * for example if you loose internet connection we want to run bootstrap.py and have it finish a 2nd time.
-  * also this is allot easier when people are testing the bootstrap.py script
-* isolate definitions as much as possible.  Allow commenting out of these.
+* The main goal is to bootstrap your chromebook into a development box.
+* This script should always be able to run again if something goes wrong.
+  * For example if you loose internet connection we want to run bootstrap.py and have it finish a 2nd time.
+  * Also this makes it allot easier when people are testing the bootstrap.py script.
+* Isolate definitions as much as possible.  Allow commenting out of these.
