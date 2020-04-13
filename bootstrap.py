@@ -116,7 +116,7 @@ def apt_get_packages():
 
     sb.run(command1, shell=True, check=True)
     sb.run(command2, shell=True, check=True)
-    
+
     sb.run(["apt-get", "update"], check=True)
 
     packages = " ".join(PACKAGES_LIST)
@@ -133,10 +133,18 @@ def generate_ssh_keys():
     subdirs = [os.path.join(d, o) for o in os.listdir(d) if os.path.isdir(os.path.join(d,o))]
 
     for each in subdirs:
+        if not os.path.isdir(each + "/.ssh"):
+            os.mkdir(each + "/.ssh")
+
         if not os.path.isfile(each + "/.ssh/id_rsa"):
             command2 = "ssh-keygen -t rsa -f " + each + "/.ssh/id_rsa -N '' -b 4096"
             sb.run(command2, shell=True, check=True)
-            
+            command3 = "chown " + each.split("/")[-1] + ":" + each.split("/")[-1] + " /.ssh/id_rsa"
+            command4 = "chown " + each.split("/")[-1] + ":" + each.split("/")[-1] + " /.ssh/id_rsa.pub"
+
+            sb.call(command3, shell=True, check=True)
+            sb.call(command4, shell=True, check=True)
+
 def install_ruby_rails():
     command1 = "gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB"
     command2 = "curl -sSL https://get.rvm.io | bash -s stable --rails"
