@@ -118,7 +118,7 @@ def apt_get_packages():
     sb.run(["apt-get", "update"], check=True)
 
     packages = " ".join(PACKAGES_LIST)
-    install_command = "export DEBIAN_FRONTEND=noninteractive && apt-get -y install " + packages
+    install_command = "DEBIAN_FRONTEND=noninteractive apt-get -y install " + packages
     sb.run(install_command, shell=True, check=True)
     
 def generate_ssh_keys():
