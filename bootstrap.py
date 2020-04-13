@@ -43,7 +43,7 @@ PACKAGES_LIST = ["build-essential",
                  "ca-certificates",
                  "code",
                  "default-mysql-server",
-		         "gnupg2",
+                 "gnupg2",
                  "htop",
                  "openjdk-11-jdk",
                  "nodejs",
@@ -83,10 +83,10 @@ def add_to_file(filename, contents):
             outfile.write(contents + "\n")
 
 def check_for_root():
-	if os.geteuid() != 0:
-		print ("Sorry you have not ran this script with root privileges...")
-		print ("Please use root or sudo")
-		sys.exit(1)
+    if os.geteuid() != 0:
+        print ("Sorry you have not ran this script with root privileges...")
+        print ("Please use root or sudo")
+        sys.exit(1)
 
 def set_git_info():
     print ("config git info")
@@ -141,8 +141,8 @@ def generate_ssh_keys():
         if not os.path.isfile(each + "/.ssh/id_rsa"):
             command2 = "ssh-keygen -t rsa -f " + each + "/.ssh/id_rsa -N '' -b 4096"
             sb.run(command2, shell=True, check=True)
-            command3 = "chown " + each.split("/")[-1] + ":" + each.split("/")[-1] + " /.ssh/id_rsa"
-            command4 = "chown " + each.split("/")[-1] + ":" + each.split("/")[-1] + " /.ssh/id_rsa.pub"
+            command3 = "chown " + each.split("/")[-1] + ":" + each.split("/")[-1] + " " + each + "/.ssh/id_rsa"
+            command4 = "chown " + each.split("/")[-1] + ":" + each.split("/")[-1] + " " + each + "/.ssh/id_rsa.pub"
 
             sb.run(command3, shell=True, check=True)
             sb.run(command4, shell=True, check=True)
