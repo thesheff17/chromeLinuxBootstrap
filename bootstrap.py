@@ -67,11 +67,11 @@ GOLANG = "https://dl.google.com/go/go1.14.2.linux-amd64.tar.gz"
 GOLANGFILE = GOLANG.split("/")[-1]
 
 def add_to_file(filename, contents):
-    f1 = open(filename, 'r')
-    data = f1.read()
-    f1.close()
-
     if os.path.isfile(filename):
+        f1 = open(filename, 'r')
+        data = f1.read()
+        f1.close()
+
         if contents not in data:
             with open(filename, 'a') as outfile:
                 outfile.write(contents + "\n")
