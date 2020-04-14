@@ -345,10 +345,10 @@ if __name__ == "__main__":
     
     # required def
     check_for_root()
+    set_git_info()
     apt_get_packages()
 
     # optional def
-    set_git_info()
     generate_ssh_keys()
     install_ruby_rails()
     install_rust()
