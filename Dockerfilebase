@@ -1,0 +1,47 @@
+FROM debian
+
+# time docker build . -t thesheff17/chromelinuxbootstrapbase:latest -f Dockerfilebase
+
+# this is the base container for Dockerfile
+# this should only be use for testing
+
+RUN apt-get update && \
+	apt-get upgrade -y && \
+    apt-get install -y autoconf \
+                       automake \
+                       bison \
+                       curl \
+                       default-mysql-server \
+                       default-libmysqld-dev \
+                       git \
+                       gnupg2 \
+                       gpg \
+                       htop \
+                       libffi-dev \
+                       libgdbm-dev \
+                       libgmp-dev \
+                       libncurses5-dev \
+                       libreadline-dev \
+                       libsqlite3-dev \
+                       libtool \
+                       libyaml-dev \
+                       openjdk-11-jdk \
+                       pkg-config \
+                       postgresql-11 \
+                       postgresql-server-dev-11 \
+                       python3 \
+                       python3-dev \
+                       python3-pip \
+                       python3-dev \
+                       python3-venv \
+                       sqlite3 \
+                       sudo \
+                       tmux \
+                       vim \
+                       wget \
+                       zlib1g-dev && \
+    				   apt-get autoremove && \
+    				   apt-get clean && \
+    				rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+CMD ["/bin/bash"]

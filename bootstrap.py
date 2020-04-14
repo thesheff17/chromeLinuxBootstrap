@@ -42,30 +42,91 @@ import time
 PACKAGES_LIST = ["build-essential",
                  "ca-certificates",
                  "code",
+                 "cowsay",
+                 "default-libmysqld-dev",
                  "default-mysql-server",
+                 "fortune",
                  "gnupg2",
                  "htop",
+                 "locate",
+                 "lolcat",
                  "openjdk-11-jdk",
-                 "nodejs",
-                 "npm",
                  "postgresql-11",
-                 "python3-pip",
+                 "postgresql-server-dev-11",
                  "python3-dev",
+                 "python3-pip",
+                 "python3-psycopg2",
+                 "python3-venv",
                  "vim",
-                 "wget",
-                 "tmux"]
+                 "sl",
+                 "tmux",
+                 "wget"]
 
 # ruby gems
 GEMS = "bundler jekyll"
 
 # global pip packages
 PIP_PACKAGES = ["bpython",
-                "virtualenvwrapper",
-                "virtualenv"]
+                "virtualenv",
+                "virtualenvwrapper"]
+# virtual env packages
+VIRT_PIP_PACKAGES = ["alembic",
+                     "awscli",
+                     "boto3",
+                     "bpython",
+                     "coverage",
+                     "django",
+                     "django-autoslug",
+                     "django-braces",
+                     "django-compressor",
+                     "django-crispy-forms",
+                     "django-debug-toolbar",
+                     "django-environ",
+                     "django-floppyforms",
+                     "django-model-utils",
+                     "django-nose django-axes",
+                     "django-redis",
+                     "django-sass-processor",
+                     "django-secure",
+                     "django-test-plus",
+                     "django_extensions",
+                     "factory_boy",
+                     "flask",
+                     "flask-bcrypt",
+                     "flask-login",
+                     "flask-migrate",
+                     "flask-script",
+                     "flask-sqlalchemy",
+                     "flask-testing",
+                     "flask-wtf",
+                     "gunicorn",
+                     "ipdb",
+                     "itsdangerous",
+                     "jupyter",
+                     "libsass",
+                     "mako",
+                     "markupsafe",
+                     "pillow django-allauth",
+                     "psycopg2",
+                     "py-bcrypt",
+                     "pyflakes",
+                     "pylibmc",
+                     "pymysql",
+                     "python-dateutil",
+                     "pytz",
+                     "redis",
+                     "sphinx",
+                     "sqlalchemy",
+                     "unicode-slugify",
+                     "werkzeug",
+                     "whitenoise",
+                     "wtforms"]
 
 # golang url
 GOLANG = "https://dl.google.com/go/go1.14.2.linux-amd64.tar.gz"
 GOLANGFILE = GOLANG.split("/")[-1]
+
+home_dir = os.path.expanduser("~")
 
 def add_to_file(filename, contents):
     if os.path.isfile(filename):
@@ -89,7 +150,7 @@ def check_for_root():
         sys.exit(1)
 
 def set_git_info():
-    # we can add a file called gitinfo that is:
+    # we can add a file called gitinfo in our home directory to auotmate this
     # email
     # username 
     # and I will automatically read it here otherwise it prompts you for this info
@@ -98,8 +159,9 @@ def set_git_info():
     email = ""
     name = ""
 
-    if os.path.isfile("./gitinfo"):
-        f1 = open("./gitinfo", 'r')
+    print (home_dir + "/gitinfo")
+    if os.path.isfile(home_dir + "/gitinfo"):
+        f1 = open(home_dir + "/gitinfo", 'r')
         data = f1.readlines()
         f1.close()
         email = data[0]
@@ -118,8 +180,10 @@ def set_git_info():
     subdirs = [os.path.join(d, o) for o in os.listdir(d) if os.path.isdir(os.path.join(d,o))]
 
     for each in subdirs:
-        command3 = "su - " + each.split("/")[-1] + " -c " + '"' + command1 + '"'
+        command3 = "su - " + each.split("/")[-1] + " && " + command1
+        command4 = "su - " + each.split("/")[-1] + " && " + command2
         sb.run(command3, shell=True, check=True)
+        sb.run(command4, shell=True, check=True)
      
 def apt_get_packages():
     # vscode stuff
@@ -161,20 +225,29 @@ def generate_ssh_keys():
             sb.run(command4, shell=True, check=True)
 
 def install_ruby_rails():
-    command1 = "gpg --yes --always-trust --keyserver hkp://pool.sks-keyservers.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB"
+    command1 = "gpg2 --yes --always-trust --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB"
     command2 = "curl -sSL https://get.rvm.io | bash -s stable --rails"
     command3 = "sudo ln -s /usr/local/rvm/rubies/ruby*/bin/ruby /usr/bin/ruby"
-    command4 = "/usr/local/rvm/rubies/ruby*/bin/gem install " + GEMS 
+    command4 = "sudo ln -s /usr/local/rvm/rubies/ruby*/bin/gem /usr/bin/gem"
+    command5 = "/etc/profile.d/rvm.sh && gem install " + GEMS
+    command6 = "curl -sSL https://get.rvm.io | bash -s stable"
+    command7 = "/usr/local/rvm/bin/rvm all do rvm docs generate"
 
     sb.run(command1, shell=True, check=True)
     sb.run(command2, shell=True, check=True)
 
     if os.path.isfile("/usr/bin/ruby"):
         os.remove("/usr/bin/ruby")
+
+    if os.path.isfile("/usr/bin/gem"):
+        os.remove("/usr/bin/gem")
+
     sb.run(command3, shell=True, check=True)
-    
-    sb.run(command4, shell=True)
-    
+    sb.run(command4, shell=True, check=True)
+    sb.run(command5, shell=True, check=True)
+    sb.run(command6, shell=True, check=True)
+    sb.run(command7, shell=True, check=True)
+
 def install_rust():
     command1 = "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y"
     sb.run(command1, shell=True, check=True)
@@ -187,7 +260,7 @@ def install_golang():
     if os.path.isdir("/usr/local/go"):
         shutil.rmtree("/usr/local/go")
 
-    command1 = ["wget", GOLANG]
+    command1 = ["wget", "-q", GOLANG]
     command2 = "tar -C /usr/local -xzf go*.tar.gz"
 
     sb.run(command1, check=True)
@@ -203,12 +276,61 @@ def install_golang():
         add_to_file(each + "/.bashrc", s1)
 
 def configure_pip():
+    # I could not get virtualenvwrapper installed correctly under the non privileged user
+    # there is allot of problems with the way you have to "source" certain files.
+    # for now I will just create an venv one.  
+    # feel free to provide a PR if you can get this working...
+
+    virt_pip_packages = " ".join(VIRT_PIP_PACKAGES)
     command1 = ["pip3", "install", "pip", "--upgrade"]
     command2 = ["pip3", "install",] + PIP_PACKAGES
-
+   
     sb.run(command1, check=True)
     sb.run(command2, check=True)
    
+    add_to_file("/root/.bashrc", "export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3")
+    add_to_file("/root/.bashrc", "source /usr/local/bin/virtualenvwrapper.sh")
+
+    d = '/home/'
+    subdirs = [os.path.join(d, o) for o in os.listdir(d) if os.path.isdir(os.path.join(d,o))]
+
+    for each in subdirs:
+        add_to_file(each + "/.bashrc", "export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3")
+        add_to_file(each + "/.bashrc", "source /usr/local/bin/virtualenvwrapper.sh")
+        command3 = "su - " + each.split("/")[-1]
+        sb.run(command3, shell=True, check=True)
+
+        if not os.path.isdir(each + "/.virtualenvs/"):
+            os.mkdir(each + "/.virtualenvs/")
+
+        command3 = "su - " + each.split("/")[-1] + " && python3 -m venv " + each + "/.virtualenvs/venv3"
+        sb.run(command3, shell=True, check=True)
+
+        command4 =  'bash -c " su - ' + each.split("/")[-1] + " && source " + each + "/.virtualenvs/venv3/bin/activate && pip3 install --no-cache-dir " + virt_pip_packages + '"'
+        sb.run(command4, shell=True, check=True)
+
+def install_node():
+    command1 = "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash"
+    command2 = "chmod +x /root/.nvm/nvm.sh"
+    command3 = 'bash -c "source /root/.bashrc && nvm install node --lts"'
+
+    sb.run(command1, shell=True, check=True)
+    sb.run(command2, shell=True, check=True)
+    sb.run(command3, shell=True, check=True)
+
+def update_locate_db():
+    command1 = "updatedb"
+    sb.run(command1, check=True)
+
+def add_to_bashrc():
+    add_to_file("/root/.bashrc", "export PATH=$PATH:/usr/games/")
+
+    d = '/home/'
+    subdirs = [os.path.join(d, o) for o in os.listdir(d) if os.path.isdir(os.path.join(d,o))]
+    for each in subdirs:
+        add_to_file(each + "/.bashrc", "export PATH=$PATH:/usr/games/")
+
+
 if __name__ == "__main__":
     start = time.time()
     
@@ -224,6 +346,9 @@ if __name__ == "__main__":
     install_rust()
     install_golang()
     configure_pip()
+    install_node()
+    add_to_bashrc()
+    update_locate_db()
 
     done = time.time()
     elapsed = done - start
