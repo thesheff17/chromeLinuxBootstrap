@@ -328,12 +328,23 @@ def update_locate_db():
     sb.run(command1, shell=True, check=True)
 
 def add_to_bashrc():
-    add_to_file("/root/.bashrc", "export PATH=$PATH:/usr/games/")
+    s1 = "source $HOME/.cargo/env"
+    s2 = "export PATH=$PATH:/usr/games/"
+    s3 = 'export NVM_DIR="$HOME/.nvm"'
+    s4 = '''[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm'''
+    s5 = '''[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion'''
+
+    add_to_file("/root/.bashrc", s1)
+    add_to_file("/root/.bashrc", s2)
 
     d = '/home/'
     subdirs = [os.path.join(d, o) for o in os.listdir(d) if os.path.isdir(os.path.join(d,o))]
     for each in subdirs:
-        add_to_file(each + "/.bashrc", "export PATH=$PATH:/usr/games/")
+        add_to_file(each + "/.bashrc", s1)
+        add_to_file(each + "/.bashrc", s2)
+        add_to_file(each + "/.bashrc", s3)
+        add_to_file(each + "/.bashrc", s4)
+        add_to_file(each + "/.bashrc", s5)
 
 
 if __name__ == "__main__":
@@ -343,12 +354,10 @@ if __name__ == "__main__":
     sb.run(["clear"])
     print ("bootstrap.py started...")
     
-    # required def
+    # should keep these in order if possible
     check_for_root()
-    set_git_info()
+    set_git_info() 
     apt_get_packages()
-
-    # optional def
     generate_ssh_keys()
     install_ruby_rails()
     install_rust()
