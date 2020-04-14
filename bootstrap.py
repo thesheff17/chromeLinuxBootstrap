@@ -126,6 +126,14 @@ VIRT_PIP_PACKAGES = ["alembic",
 GOLANG = "https://dl.google.com/go/go1.14.2.linux-amd64.tar.gz"
 GOLANGFILE = GOLANG.split("/")[-1]
 
+# vscode extentions
+VSCODE_EXTENTIONS = ["code --install-extension dbaeumer.vscode-eslint",
+                     "code --install-extension HookyQR.beautify",
+                     "code --install-extension kalitaalexey.vscode-rust",
+                     "code --install-extension ms-python.python",
+                     "code --install-extension ms-vscode.Go",
+                     "code --install-extension rust-lang.rust"]
+
 home_dir = os.path.expanduser("~")
 
 def add_to_file(filename, contents):
@@ -321,6 +329,14 @@ def install_node():
     sb.run(command2, shell=True, check=True)
     sb.run(command3, shell=True, check=True)
 
+def install_vscode_extentions():
+    d = '/home/'
+    subdirs = [os.path.join(d, o) for o in os.listdir(d) if os.path.isdir(os.path.join(d,o))]
+
+    for each in subdirs:
+        for each1 in VSCODE_EXTENTIONS:
+            sb.run("sudo -H -u " + each.split("/")[-1] + " bash -c '" + each1 + "'", shell=True, check=True)
+
 def update_locate_db():
     # this command throws some find errors
     # so for now I'm going to suppress the error
@@ -354,7 +370,6 @@ if __name__ == "__main__":
     sb.run(["clear"])
     print ("bootstrap.py started...")
     
-    # should keep these in order if possible
     check_for_root()
     set_git_info() 
     apt_get_packages()
@@ -364,6 +379,7 @@ if __name__ == "__main__":
     install_golang()
     configure_pip()
     install_node()
+    install_vscode_extentions()
     add_to_bashrc()
     update_locate_db()
 
