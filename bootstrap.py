@@ -259,8 +259,12 @@ def install_ruby_rails():
     sb.run(command7, shell=True, check=True)
 
 def install_rust():
-    command1 = "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y"
-    sb.run(command1, shell=True, check=True)
+    d = '/home/'
+    subdirs = [os.path.join(d, o) for o in os.listdir(d) if os.path.isdir(os.path.join(d,o))]
+
+    for each in subdirs:
+        command1 = "sudo -H -u " + each.split("/")[-1] + " bash -c 'curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y'"
+        sb.run(command1, shell=True, check=True)
 
 def install_golang():
     # clean up if we alrady installed it
@@ -350,7 +354,6 @@ def add_to_bashrc():
     s4 = '''[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm'''
     s5 = '''[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion'''
 
-    add_to_file("/root/.bashrc", s1)
     add_to_file("/root/.bashrc", s2)
 
     d = '/home/'
@@ -373,15 +376,15 @@ if __name__ == "__main__":
     check_for_root()
     set_git_info() 
     apt_get_packages()
-    generate_ssh_keys()
-    install_ruby_rails()
+    # generate_ssh_keys()
+    # install_ruby_rails()
     install_rust()
-    install_golang()
-    configure_pip()
-    install_node()
-    install_vscode_extentions()
+    # install_golang()
+    # configure_pip()
+    # install_node()
+    # install_vscode_extentions()
     add_to_bashrc()
-    update_locate_db()
+    # update_locate_db()
 
     done = time.time()
     elapsed = done - start
