@@ -309,7 +309,7 @@ def configure_pip():
         command3 = "sudo -H -u " + each.split("/")[-1] + " bash -c 'python3 -m venv " + each + "/.virtualenvs/venv3'"
         sb.run(command3, shell=True, check=True)
 
-        command4 =  'bash -c " su - ' + each.split("/")[-1] + " && source " + each + "/.virtualenvs/venv3/bin/activate && pip3 install --no-cache-dir " + virt_pip_packages + '"'
+        command4 =  'sudo -H -u ' + each.split("/")[-1] + " bash -c 'source " + each + "/.virtualenvs/venv3/bin/activate && pip3 install --no-cache-dir " + virt_pip_packages + "'"
         sb.run(command4, shell=True, check=True)
 
 def install_node():
