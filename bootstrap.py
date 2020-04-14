@@ -181,8 +181,8 @@ def set_git_info():
 
     for each in subdirs:
         
-        command3 = "sudo -H -u " + each.split("/")[-1] + " -c 'git config --global user.email " + email.strip("\n") + "'"
-        command4 = "sudo -H -u " + each.split("/")[-1] + " -c 'git config --global user.name " + name.strip("\n") + "'"
+        command3 = "sudo -H -u " + each.split("/")[-1] + " bash -c 'git config --global user.email " + email.strip("\n") + "'"
+        command4 = "sudo -H -u " + each.split("/")[-1] + " bash -c 'git config --global user.name " + name.strip("\n") + "'"
         print (command3)
         sb.run(command3, shell=True, check=True)
         sb.run(command4, shell=True, check=True)
@@ -306,7 +306,7 @@ def configure_pip():
             sb.run(command3, shell=True, check=True)
 
         # command3 = "su - " + each.split("/")[-1] + " && python3 -m venv " + each + "/.virtualenvs/venv3"
-        command3 = "sudo -H -u " + each.split("/")[-1] + " -c  'python3 -m venv " + each + "/.virtualenvs/venv3'"
+        command3 = "sudo -H -u " + each.split("/")[-1] + " bash -c 'python3 -m venv " + each + "/.virtualenvs/venv3'"
         sb.run(command3, shell=True, check=True)
 
         command4 =  'bash -c " su - ' + each.split("/")[-1] + " && source " + each + "/.virtualenvs/venv3/bin/activate && pip3 install --no-cache-dir " + virt_pip_packages + '"'
