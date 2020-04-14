@@ -322,8 +322,10 @@ def install_node():
     sb.run(command3, shell=True, check=True)
 
 def update_locate_db():
-    command1 = "updatedb"
-    sb.run(command1, check=True)
+    # this command throws some find errors
+    # so for now I'm going to suppress the error
+    command1 = "updatedb 2>/dev/null"
+    sb.run(command1, shell=True, check=True)
 
 def add_to_bashrc():
     add_to_file("/root/.bashrc", "export PATH=$PATH:/usr/games/")
@@ -341,9 +343,12 @@ if __name__ == "__main__":
     sb.run(["clear"])
     print ("bootstrap.py started...")
     
+    # required def
     check_for_root()
-    set_git_info()
     apt_get_packages()
+
+    # optional def
+    set_git_info()
     generate_ssh_keys()
     install_ruby_rails()
     install_rust()
