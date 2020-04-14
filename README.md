@@ -26,7 +26,7 @@ buildBase.sh   - builds Dockerfilebase file
 Dockerfile     - inheritance Dockerfilebase and runs bootstrap.py
 run.sh         - builds Dockerfile file
 ```
-## problems I ran into with this script
+## some issues I noticed writing this:
 
 * virtualenvwrapper
   * this tool wants you to source a file after installation and your not running this in bash
@@ -39,3 +39,7 @@ run.sh         - builds Dockerfile file
     file over and over again.  The script still runs fine and I beleive I only see them inside
     docker when testing.  I will keep an eye for a fix for this.  If you have an idea how to fix
     this let me know with a PR.
+
+* python2 being installed
+  * I'm not really sure why this is being installed still but it should be investegated what depends on 
+    and remove it since python2 end of life was Jan 1 2020
