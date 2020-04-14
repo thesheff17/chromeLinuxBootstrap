@@ -49,7 +49,6 @@ PACKAGES_LIST = ["build-essential",
                  "gnupg2",
                  "htop",
                  "locate",
-                 "lolcat",
                  "openjdk-11-jdk",
                  "postgresql-11",
                  "postgresql-server-dev-11",
@@ -134,7 +133,10 @@ VSCODE_EXTENTIONS = ["code --install-extension dbaeumer.vscode-eslint",
                      "code --install-extension ms-vscode.Go",
                      "code --install-extension rust-lang.rust"]
 
-home_dir = os.path.expanduser("~")
+# npm link
+NPM = "https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh"
+
+HOME_DIR = os.path.expanduser("~")
 
 def add_to_file(filename, contents):
     if os.path.isfile(filename):
@@ -157,6 +159,13 @@ def check_for_root():
         print ("Please use root or sudo")
         sys.exit(1)
 
+def get_home_dirs():
+    d = '/home/'
+    subdirs = [os.path.join(d, o) for o in os.listdir(d) if os.path.isdir(os.path.join(d,o))]
+    return subdirs
+
+HOME_DIRS = get_home_dirs()
+
 def set_git_info():
     # we can add a file called gitinfo in our home directory to auotmate this
     # email
@@ -167,9 +176,9 @@ def set_git_info():
     email = ""
     name = ""
 
-    print (home_dir + "/gitinfo")
-    if os.path.isfile(home_dir + "/gitinfo"):
-        f1 = open(home_dir + "/gitinfo", 'r')
+    print (HOME_DIR + "/gitinfo")
+    if os.path.isfile(HOME_DIR + "/gitinfo"):
+        f1 = open(HOME_DIR + "/gitinfo", 'r')
         data = f1.readlines()
         f1.close()
         email = data[0]
@@ -184,10 +193,7 @@ def set_git_info():
     sb.run(command1, shell=True, check=True)
     sb.run(command2, shell=True, check=True)
     
-    d = '/home/'
-    subdirs = [os.path.join(d, o) for o in os.listdir(d) if os.path.isdir(os.path.join(d,o))]
-
-    for each in subdirs:
+    for each in HOME_DIRS:
         
         command3 = "sudo -H -u " + each.split("/")[-1] + " bash -c 'git config --global user.email " + email.strip("\n") + "'"
         command4 = "sudo -H -u " + each.split("/")[-1] + " bash -c 'git config --global user.name " + name.strip("\n") + "'"
@@ -218,10 +224,7 @@ def generate_ssh_keys():
         sb.run(command1, shell=True, check=True)
 
     # generate keys for anyone users in the home directory
-    d = '/home/'
-    subdirs = [os.path.join(d, o) for o in os.listdir(d) if os.path.isdir(os.path.join(d,o))]
-
-    for each in subdirs:
+    for each in HOME_DIRS:
         if not os.path.isdir(each + "/.ssh"):
             os.mkdir(each + "/.ssh")
 
@@ -259,10 +262,7 @@ def install_ruby_rails():
     sb.run(command7, shell=True, check=True)
 
 def install_rust():
-    d = '/home/'
-    subdirs = [os.path.join(d, o) for o in os.listdir(d) if os.path.isdir(os.path.join(d,o))]
-
-    for each in subdirs:
+    for each in HOME_DIRS:
         command1 = "sudo -H -u " + each.split("/")[-1] + " bash -c 'curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y'"
         sb.run(command1, shell=True, check=True)
 
@@ -305,10 +305,7 @@ def configure_pip():
     add_to_file("/root/.bashrc", "export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3")
     add_to_file("/root/.bashrc", "source /usr/local/bin/virtualenvwrapper.sh")
 
-    d = '/home/'
-    subdirs = [os.path.join(d, o) for o in os.listdir(d) if os.path.isdir(os.path.join(d,o))]
-
-    for each in subdirs:
+    for each in HOME_DIRS:
         add_to_file(each + "/.bashrc", "export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3")
         add_to_file(each + "/.bashrc", "source /usr/local/bin/virtualenvwrapper.sh")
         
@@ -317,7 +314,6 @@ def configure_pip():
             command3 = "chown " + each.split("/")[-1] + ":" + each.split("/")[-1] + " " + each + "/.virtualenvs/"
             sb.run(command3, shell=True, check=True)
 
-        # command3 = "su - " + each.split("/")[-1] + " && python3 -m venv " + each + "/.virtualenvs/venv3"
         command3 = "sudo -H -u " + each.split("/")[-1] + " bash -c 'python3 -m venv " + each + "/.virtualenvs/venv3'"
         sb.run(command3, shell=True, check=True)
 
@@ -325,19 +321,21 @@ def configure_pip():
         sb.run(command4, shell=True, check=True)
 
 def install_node():
-    command1 = "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash"
-    command2 = "chmod +x /root/.nvm/nvm.sh"
-    command3 = 'bash -c "source /root/.bashrc && nvm install node --lts"'
+    s1 = 'export NVM_DIR="$HOME/.nvm"'
+    s2 = '''[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm'''
+    s3 = '''[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion'''
 
-    sb.run(command1, shell=True, check=True)
-    sb.run(command2, shell=True, check=True)
-    sb.run(command3, shell=True, check=True)
+    for each in HOME_DIRS:
+        command1 = "cd ~ && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash"
+        command2 = "chmod +x " + each + "/.nvm/nvm.sh"
+        command3 = "source " + each + "/.nvm/nvm.sh && nvm install node --lts"
+
+        sb.run("sudo -H -u " +  each.split("/")[-1] + " bash -c '" + command1 + "'", shell=True, check=True)
+        sb.run("sudo -H -u " +  each.split("/")[-1] + " bash -c '" + command2 + "'", shell=True, check=True)
+        sb.run("sudo -H -u " +  each.split("/")[-1] + " bash -c '" + command3 + "'", shell=True, check=True)
 
 def install_vscode_extentions():
-    d = '/home/'
-    subdirs = [os.path.join(d, o) for o in os.listdir(d) if os.path.isdir(os.path.join(d,o))]
-
-    for each in subdirs:
+    for each in HOME_DIRS:
         for each1 in VSCODE_EXTENTIONS:
             sb.run("sudo -H -u " + each.split("/")[-1] + " bash -c '" + each1 + "'", shell=True, check=True)
 
@@ -350,20 +348,12 @@ def update_locate_db():
 def add_to_bashrc():
     s1 = "source $HOME/.cargo/env"
     s2 = "export PATH=$PATH:/usr/games/"
-    s3 = 'export NVM_DIR="$HOME/.nvm"'
-    s4 = '''[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm'''
-    s5 = '''[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion'''
-
+    
     add_to_file("/root/.bashrc", s2)
 
-    d = '/home/'
-    subdirs = [os.path.join(d, o) for o in os.listdir(d) if os.path.isdir(os.path.join(d,o))]
-    for each in subdirs:
+    for each in HOME_DIRS:
         add_to_file(each + "/.bashrc", s1)
         add_to_file(each + "/.bashrc", s2)
-        add_to_file(each + "/.bashrc", s3)
-        add_to_file(each + "/.bashrc", s4)
-        add_to_file(each + "/.bashrc", s5)
 
 
 if __name__ == "__main__":
