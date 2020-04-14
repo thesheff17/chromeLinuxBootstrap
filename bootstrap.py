@@ -180,8 +180,10 @@ def set_git_info():
     subdirs = [os.path.join(d, o) for o in os.listdir(d) if os.path.isdir(os.path.join(d,o))]
 
     for each in subdirs:
-        command3 = "su - " + each.split("/")[-1] + " && " + command1
-        command4 = "su - " + each.split("/")[-1] + " && " + command2
+        
+        command3 = "sudo -H -u " + each.split("/")[-1] + " -c 'git config --global user.email " + email.strip("\n") + "'"
+        command4 = "sudo -H -u " + each.split("/")[-1] + " -c 'git config --global user.name " + name.strip("\n") + "'"
+        print (command3)
         sb.run(command3, shell=True, check=True)
         sb.run(command4, shell=True, check=True)
      
@@ -297,13 +299,14 @@ def configure_pip():
     for each in subdirs:
         add_to_file(each + "/.bashrc", "export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3")
         add_to_file(each + "/.bashrc", "source /usr/local/bin/virtualenvwrapper.sh")
-        command3 = "su - " + each.split("/")[-1]
-        sb.run(command3, shell=True, check=True)
-
+        
         if not os.path.isdir(each + "/.virtualenvs/"):
             os.mkdir(each + "/.virtualenvs/")
+            command3 = "chown " + each.split("/")[-1] + ":" + each.split("/")[-1] + " " + each + "/.virtualenvs/"
+            sb.run(command3, shell=True, check=True)
 
-        command3 = "su - " + each.split("/")[-1] + " && python3 -m venv " + each + "/.virtualenvs/venv3"
+        # command3 = "su - " + each.split("/")[-1] + " && python3 -m venv " + each + "/.virtualenvs/venv3"
+        command3 = "sudo -H -u " + each.split("/")[-1] + " -c  'python3 -m venv " + each + "/.virtualenvs/venv3'"
         sb.run(command3, shell=True, check=True)
 
         command4 =  'bash -c " su - ' + each.split("/")[-1] + " && source " + each + "/.virtualenvs/venv3/bin/activate && pip3 install --no-cache-dir " + virt_pip_packages + '"'
